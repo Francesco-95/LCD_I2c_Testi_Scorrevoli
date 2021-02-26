@@ -1,0 +1,76 @@
+//libreria: per lcd
+//https://bitbucket.org/fmalpartida/new-liquidcrystal 
+#include <Wire.h> 
+#include <LiquidCrystal_I2C.h>
+
+#define I2C_ADDR 0x27 
+#define BACKLIGHT_PIN 3
+#define En_pin 2
+#define Rw_pin 1
+#define Rs_pin 0
+#define D4_pin 4
+#define D5_pin 5
+#define D6_pin 6
+#define D7_pin 7
+
+LiquidCrystal_I2C lcd(I2C_ADDR,En_pin,Rw_pin,Rs_pin,D4_pin,D5_pin,D6_pin,D7_pin);
+
+
+String TXT="Era piu' difficile di quel che credevo =)";
+char testo[15];
+
+int Lung=0;
+
+unsigned long t, dt;
+
+void setup() {
+  Serial.begin(9600);
+  lcd.begin(16,2);
+  lcd.setBacklightPin(BACKLIGHT_PIN,POSITIVE);
+  lcd.setBacklight(HIGH);
+  
+  lcd.home ();    
+  lcd.print("Hello World!");    
+  delay (500);
+  lcd.clear();
+
+  for (int i=0; i<16; i++){
+    testo[i]=' ';
+    } 
+}
+
+
+//TXT.length()
+void loop() {
+  
+Serial.print("0 - ");
+Serial.println(testo);
+
+dt=millis() - t;
+
+if (dt>=1000){
+
+//stampa testo
+lcd.setCursor(0,0);
+lcd.print(testo);
+
+// compongo l'array testo per la visualizzazione
+for (int i=0; i<16; i++){
+  if (i==15){
+    testo[i]=TXT[Lung];   
+    } else {
+    testo[i]=testo [i+1];
+    } 
+  }
+  
+Lung++;
+//condizione di pulizia
+if (Lung== TXT.length()+1){
+  Lung=0;
+   for (int i=0; i<16; i++){
+    testo[i]=' ';
+    }
+}
+t=millis();
+}
+}
